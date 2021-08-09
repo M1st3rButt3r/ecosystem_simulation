@@ -1,12 +1,15 @@
 class Species:
-    def __init__(self, birth_rate, death_rate):
-        self.birth_rate = birth_rate
-        self.death_rate = death_rate
+    def __init__(self, name, birth_rate, mortality_rate):
+        self.name = name
+        self.birth_rate = birth_rate  # New organism per individual
+        # Mortality might be replaced with age (e.g. age 80 means every 1/80th individual should die)
+        self.mortality_rate = mortality_rate  # Probability of dying through natural causes
         self.predators = []
-        self.food = []
+        self.prey = []
 
-    def add_food(self, species):
-        self.food.append(species)
+    def add_prey(self, species):
+        self.prey.append(species)
+        species.add_predator(self)
 
     def add_predator(self, predator):
         self.predators.append(predator)
@@ -21,41 +24,61 @@ class Population:
         self.available_food = 0
         self.count_over_time = []
 
-    def apply_development(self):
-        self.count += self.development
-        self.count_over_time.append(self.count)
-        if self.count < 1:
-            self.count = 0
-
     def calculate_development(self):
         self.calculate_available_food()
+        # For it all to work properly, calculate decline for everything,
+        # apply the new values and then do a second round to add the incline
         self.development = self.calculate_incline() - self.calculate_decline()
 
+    def apply_development(self):
+        self.count += self.development
+
+        if self.count < 2:
+            self.go_extinct()
+        self.count_over_time.append(self.count)
+
+    def go_extinct(self):
+        self.count = 0
+
     def calculate_available_food(self):
-        if len(self.species.food) == 0 or self.count <= 0:
-            self.available_food = 1
-            return
+        if len(self.species.prey) == 0:
+            self.calculate_available_food_herbivores()
+        else:
+            self.calculate_available_food_carnivores()
+
+    def calculate_available_food_herbivores(self):
+        self.available_food = 1
+
+    def calculate_available_food_carnivores(self):
+        # TODO: Get all the possible prey.count and calculate how many of them could be consumed
+        # Do this for all predators in the end share all the values and if 2 or more species are competing,
+        # let them fight for overlapping prey. Then sum up all they've got, don't let them kill what they can't eat and
+        # give back the food amount
+
         food = self.available_food_count()
         if food > 0:
             self.available_food = food / self.count * 0.01
-            self.available_food = max(0, min(self.available_food, 1))
+            self.available_food = min(self.available_food, 1)
         else:
             self.available_food = 0
 
     def available_food_count(self):
         count = 0
         for population in self.tile.populations:
-            if population.species in self.species.food:
+            if population.species in self.species.prey:
                 count += population.count
         return count
 
     def calculate_incline(self):
+        # TODO: Available food will belong to decline as it is not boosting growth but rather boosting decline
         return self.count * self.species.birth_rate * self.available_food
 
     def calculate_decline(self):
+        if self.available_food <= 0:
+            return self.count
         decline = 0
         decline += self.calculate_decline_from_predators()
-        decline += self.calculate_decline_from_deaths()
+        decline += self.calculate_decline_from_natural_deaths()
         return decline
 
     def get_predators(self):
@@ -75,5 +98,5 @@ class Population:
     def calculate_decline_from_predator(self, predator):
         return predator.count * self.count * 0.002
 
-    def calculate_decline_from_deaths(self):
-        return self.count * self.species.death_rate
+    def calculate_decline_from_natural_deaths(self):
+        return self.count * self.species.mortality_rate
