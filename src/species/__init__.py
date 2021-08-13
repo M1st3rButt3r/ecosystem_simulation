@@ -28,14 +28,15 @@ class Population:
         self.calculate_available_food()
         # For it all to work properly, calculate decline for everything,
         # apply the new values and then do a second round to add the incline
-        self.development = self.calculate_incline() - self.calculate_decline()
+
+    def save_for_graph(self):
+        self.count_over_time.append(self.count)
 
     def apply_development(self):
         self.count += self.development
 
         if self.count < 2:
             self.go_extinct()
-        self.count_over_time.append(self.count)
 
     def go_extinct(self):
         self.count = 0
@@ -70,8 +71,8 @@ class Population:
         return count
 
     def calculate_incline(self):
-        # TODO: Available food will belong to decline as it is not boosting growth but rather boosting decline
-        return self.count * self.species.birth_rate * self.available_food
+        # TODO: Available food will belong to decline as it is not boosting growth but rather boosting decline when not available
+        self.development = self.count * self.species.birth_rate * self.available_food
 
     def calculate_decline(self):
         if self.available_food <= 0:
@@ -79,7 +80,7 @@ class Population:
         decline = 0
         decline += self.calculate_decline_from_predators()
         decline += self.calculate_decline_from_natural_deaths()
-        return decline
+        self.development = -decline
 
     def get_predators(self):
         predators = []
