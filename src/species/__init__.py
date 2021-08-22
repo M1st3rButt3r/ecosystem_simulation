@@ -24,11 +24,6 @@ class Population:
         self.available_food = 0
         self.count_over_time = []
 
-    def calculate_development(self):
-        self.calculate_available_food()
-        # For it all to work properly, calculate decline for everything,
-        # apply the new values and then do a second round to add the incline
-
     def save_for_graph(self):
         self.count_over_time.append(self.count)
 
@@ -41,14 +36,9 @@ class Population:
     def go_extinct(self):
         self.count = 0
 
-    def calculate_available_food(self):
-        if len(self.species.prey) == 0:
-            self.calculate_available_food_herbivores()
-        else:
-            self.calculate_available_food_carnivores()
-
-    def calculate_available_food_herbivores(self):
-        self.available_food = 1
+    def calculate_available_food_herbivores(self, total_food_needed):
+        percentage_of_food = min(1, self.tile.plant_food / total_food_needed)
+        self.available_food = 1 * percentage_of_food
 
     def calculate_available_food_carnivores(self):
         # TODO: Get all the possible prey.count and calculate how many of them could be consumed
@@ -57,7 +47,7 @@ class Population:
         # give back the food amount
 
         food = self.available_food_count()
-        if food > 0:
+        if food > 0 and self.count > 0:
             self.available_food = food / self.count * 0.01
             self.available_food = min(self.available_food, 1)
         else:

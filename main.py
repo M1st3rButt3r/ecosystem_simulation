@@ -3,18 +3,23 @@ from src.world import Tile
 from src.species import Species, Population
 
 
-tile = Tile()
+tile = Tile(500)
 
 foxes = Species("Fox", 0.5, 0.1)
 fox_population = Population(foxes, 5)
 tile.add_population(fox_population)
 
-rabbits = Species("Rabbit", 0.6, 0.3)
+rabbits = Species("Rabbit", 6, 0.3)
 rabbit_population = Population(rabbits, 200)
+tile.add_population(rabbit_population)
+
+bunnies = Species("Bunnies", 4, 0.3)
+rabbit_population = Population(bunnies, 20)
 tile.add_population(rabbit_population)
 
 # Predator/prey assignment
 foxes.add_prey(rabbits)
+#foxes.add_prey(bunnies)
 
 iterations = 500
 current_iteration = 0
@@ -32,3 +37,4 @@ plt.show()
 
 print(tile.populations[0].count_over_time[iterations - 1])
 print(tile.populations[1].count_over_time[iterations - 1])
+print(tile.populations[2].count_over_time[iterations - 1])
