@@ -22,7 +22,7 @@ def main():
     foxes.add_prey(rabbits)
     # foxes.add_prey(bunnies)
 
-    iterations = 78
+    iterations = 200
 
     time_steps = list(range(iterations))
 
@@ -31,12 +31,10 @@ def main():
 
     for population in tile.populations:
         plt.plot(time_steps, population.count_over_time, label=population.species.name)
+
+        print(population.species.name, population.count_over_time[-1], sep=": ")
     plt.legend()
     plt.show()
-
-    print(tile.populations[0].count_over_time[-1])
-    print(tile.populations[1].count_over_time[-1])
-    print(tile.populations[2].count_over_time[-1])
 
 
 if __name__ == "__main__":

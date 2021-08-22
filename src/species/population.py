@@ -75,7 +75,7 @@ class Population:
 
     def calculate_decline_from_predator(self, predator):
         # TODO: Unify with prey taken for food
-        return predator.count * 2
+        return predator.count
 
     def calculate_decline_from_natural_deaths(self):
         return self.count * self.species.mortality_rate
