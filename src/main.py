@@ -1,6 +1,6 @@
 from matplotlib import pyplot as plt
-from src.world import Tile
-from src.species import Species, Population
+from world import Tile
+from species import Species, Population
 
 
 def main():
@@ -15,8 +15,8 @@ def main():
     tile.add_population(rabbit_population)
 
     bunnies = Species("Bunnies", 5, 0.1)
-    rabbit_population = Population(bunnies, 50)
-    tile.add_population(rabbit_population)
+    bunny_population = Population(bunnies, 50)
+    tile.add_population(bunny_population)
 
     # Predator/prey assignment
     foxes.add_prey(rabbits)
