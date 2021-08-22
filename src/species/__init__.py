@@ -37,6 +37,9 @@ class Population:
         self.count = 0
 
     def calculate_available_food_herbivores(self, total_food_needed):
+        if total_food_needed == 0:
+            self.available_food = 0
+            return
         percentage_of_food = min(1, self.tile.plant_food / total_food_needed)
         self.available_food = 1 * percentage_of_food
 
@@ -48,7 +51,7 @@ class Population:
 
         food = self.available_food_count()
         if food > 0 and self.count > 0:
-            self.available_food = food / self.count * 0.01
+            self.available_food = (food * 0.01) / self.count
             self.available_food = min(self.available_food, 1)
         else:
             self.available_food = 0
@@ -61,15 +64,16 @@ class Population:
         return count
 
     def calculate_incline(self):
-        # TODO: Available food will belong to decline as it is not boosting growth but rather boosting decline when not available
-        self.development = self.count * self.species.birth_rate * self.available_food
+        self.development = self.count * self.species.birth_rate
 
     def calculate_decline(self):
         if self.available_food <= 0:
-            return self.count
+            self.development = -self.count
+            return
         decline = 0
         decline += self.calculate_decline_from_predators()
         decline += self.calculate_decline_from_natural_deaths()
+        decline += (self.count - decline) * (1 - self.available_food)
         self.development = -decline
 
     def get_predators(self):
@@ -87,7 +91,8 @@ class Population:
         return decline
 
     def calculate_decline_from_predator(self, predator):
-        return predator.count * self.count * 0.002
+        # TODO: Unify with prey taken for food
+        return predator.count * 2 #* self.count * 0.002
 
     def calculate_decline_from_natural_deaths(self):
         return self.count * self.species.mortality_rate
