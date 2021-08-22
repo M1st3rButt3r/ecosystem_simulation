@@ -64,7 +64,6 @@ class Population:
         return count
 
     def calculate_incline(self):
-        # TODO: Available food will belong to decline as it is not boosting growth but rather boosting decline when not available
         self.development = self.count * self.species.birth_rate
 
     def calculate_decline(self):
