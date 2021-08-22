@@ -1,8 +1,6 @@
 class Tile:
-    def __init__(self, size):
+    def __init__(self):
         self.populations = []
-        self.size = size
-        self.space = size
 
     def add_population(self, population):
         population.tile = self
@@ -15,4 +13,11 @@ class Tile:
         for population in self.populations:
             population.calculate_development()
         for population in self.populations:
+            population.calculate_decline()
+        for population in self.populations:
             population.apply_development()
+        for population in self.populations:
+            population.calculate_incline()
+        for population in self.populations:
+            population.apply_development()
+            population.save_for_graph()
